@@ -1,0 +1,45 @@
+.model_features_container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: fit-content;
+  background-color: #f7f7f7;
+  padding: 2rem 10px;
+  gap: 25px;
+}
+
+.feature_data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 300px;
+  width: 300px;
+  height: 100%;
+  text-align: center;
+}
+
+.feature_images {
+  width: 50%;
+
+  & > img {
+    border-radius: 10px;
+  }
+}
+
+.feature_name {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 10px;
+}
+
+.feature_description {
+  font-size: 16px;
+}
+
+@media screen and (orientation: portrait) {
+  .model_features_container {
+    flex-direction: column;
+  }
+}

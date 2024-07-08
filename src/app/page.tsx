@@ -1,95 +1,148 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import style from "./page.module.css";
+import { ICar } from "./models/car.model";
+import { useState, useEffect } from "react";
+import CarList from "@/components/CarList/car-list";
+import "semantic-ui-css/semantic.min.css";
+import { Dropdown } from "semantic-ui-react";
 
 export default function Home() {
+  const [cars, setCars] = useState<ICar[]>([]);
+  const [filter, setFilter] = useState<number>(1);
+  const [carsList, setCarsList] = useState<ICar[]>([]);
+
+  const optionsFilter = [
+    { key: 1, text: "Todos", value: 1 },
+    { key: 2, text: "Autos", value: 2 },
+    { key: 3, text: "Pickups y Comerciales", value: 3 },
+    { key: 4, text: "SUVs y Crossovers", value: 4 },
+  ];
+  const optionsSort = [
+    { key: 1, text: "Nada", value: 1 },
+    { key: 2, text: "De menor a mayor precio", value: 2 },
+    { key: 3, text: "De mayor a menor precio", value: 3 },
+    { key: 4, text: "Más nuevos primero", value: 4 },
+    { key: 5, text: "Más viejos primero", value: 5 },
+  ];
+
+  useEffect(() => {
+    window
+      .fetch("https://challenge.egodesign.dev/api/models/")
+      .then((response) => response.json())
+      .then((data) => {
+        setCars(data);
+        setCarsList(data);
+      });
+  }, []);
+
+  const changeFilter = (e: any, { value }: any) => {
+    setFilter(value);
+    let filteredList = [...cars];
+
+    switch (value) {
+      case 1:
+        setCarsList(filteredList);
+        break;
+      case 2:
+        filteredList = filteredList.filter(
+          (x) => x.segment === "Sedan" || x.segment === "Hatchback"
+        );
+        setCarsList([...filteredList]);
+        break;
+      case 3:
+        filteredList = filteredList.filter(
+          (x) => x.segment === "Pickups y Comerciales"
+        );
+        setCarsList([...filteredList]);
+        break;
+      case 4:
+        filteredList = filteredList.filter((x) => x.segment === "SUVs");
+        setCarsList([...filteredList]);
+        break;
+
+      default:
+        setCarsList(filteredList);
+        break;
+    }
+  };
+
+  const changeSort = (e: any, { value }: any) => {
+    let sortedList = [...cars];
+
+    switch (value) {
+      case 1:
+        setCarsList(sortedList);
+        break;
+      case 2:
+        sortedList.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+        setCarsList(sortedList);
+        break;
+      case 3:
+        sortedList.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+        setCarsList(sortedList);
+        break;
+      case 4:
+        sortedList.sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+        setCarsList(sortedList);
+        break;
+      case 5:
+        sortedList.sort((a, b) => (a.year ?? 0) - (b.year ?? 0));
+        setCarsList(sortedList);
+        break;
+
+      default:
+        setCarsList(sortedList);
+        break;
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className={style.main}>
+      <h1>Descubrí todos los modelos</h1>
+      <div className={style.filter}>
+        <ul className={style.filter_ul}>
+          <li>Filtrar por</li>
+          <li
+            className={filter === 1 ? `${style.filter_active}` : ""}
+            onClick={() => changeFilter(null, { value: 1 })}
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+            Todos
+          </li>
+          <li
+            className={filter === 2 ? `${style.filter_active}` : ""}
+            onClick={() => changeFilter(null, { value: 2 })}
+          >
+            Autos
+          </li>
+          <li
+            className={filter === 3 ? `${style.filter_active}` : ""}
+            onClick={() => changeFilter(null, { value: 3 })}
+          >
+            Pickups y Comerciales
+          </li>
+          <li
+            className={filter === 4 ? `${style.filter_active}` : ""}
+            onClick={() => changeFilter(null, { value: 4 })}
+          >
+            SUVs y Crossovers
+          </li>
+        </ul>
+        <Dropdown
+          text="Filtrar por"
+          className={style.filter_dropdown}
+          options={optionsFilter}
+          defaultValue={1}
+          onChange={changeFilter}
+        ></Dropdown>
+        <Dropdown
+          text="Ordenar por"
+          direction="left"
+          options={optionsSort}
+          defaultValue={1}
+          onChange={changeSort}
+        ></Dropdown>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      <CarList products={carsList} />
     </main>
   );
 }
